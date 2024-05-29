@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<link rel="stylesheet" href="style.css">
+
+<title> Sokratis Zikas - Teaching </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+
+<meta property="og:url" content="https://algebra.dmi.unibas.ch/zikas/" />
+<meta property="og:image" content="https://algebra.dmi.unibas.ch/zikas/web_1.jpg" />
+<meta name="description" content="Sokratis Zikas' homepage"/>
+<meta name="Keywords" content="Sokratis Zikas, Σωκρατης Ζηκας, mathematics, math"/>
+
+</head>
+<body onload="lastModifiedDate()">
+
+
+<div class="flexcontainer">
+	<div class="columns">
+	<div style="display: inline-block; align-self: flex-end;">
+
+		<div align="center">
+		<h1 style="color:white;" >Sokratis Zikas</h1>
+
+		<p><img src="OW.jpg" width="180px" title="That's a decent picture of me" /></p>
+
+		<h3 style="color:white">Contact Information</h3>
+		</div>
+
+		<p>
+		<strong style="color:white">Address</strong><br/>
+		Université de Poitiers<br />
+		Laboratoire de Mathématiques et Applications<br />
+		11 Boulevard Marie et Pierre Curie<br />
+		86073 Poitiers Cedex 9, France
+		</p>
+
+		<p>
+		<strong style="color:white">E-mail</strong><br />
+		sokratis.zikas [add @math.univ-poitiers.fr]
+		</p>
+	</div>
+	</div>
+
+
+	<div class="columns">
+
+
+
+		<div class="navbar">
+			<a href="index.html" >Research</a>
+			<a href="activities.html">Activities</a>
+			<a class="active" href="teaching.html">Teaching</a>
+		</div>
+
+		<div class="mainContent">
+			<h3>Spring 2022</h3>
+			<p>
+				<a href="https://algebra.dmi.unibas.ch/blanc/lehrveranstalt.html" target="_blank">
+				Seminar: Transformationsgruppen
+				<a>
+				, University of Basel, Teaching Assistant</p>
+			<h3>Fall 2021</h3>
+			<p> Linear Algebra I, University of Basel, Teaching Assistant</p>
+			<h3>Spring 2021</h3>
+			<p> Differential Geometry, University of Basel, Teaching Assistant</p>
+			<h3>Fall 2021</h3>
+			<p> Algebraic Geometry I, University of Basel, Teaching Assistant (in German)</p>
+			<h3>Spring 2020</h3>
+			<p> Group Cohomology, University of Basel, Teaching Assistant (in German)</p>
+			<h3>Fall 2019</h3>
+			<p> Linear Algebra I, University of Basel, Teaching Assistant</p>
+			<h3>Spring 2019</h3>
+			<p> Linear Algebra II, University of Basel, Teaching Assistant</p>
+			<h3>Fall 2018</h3>
+			<p> Linear Algebra I, University of Basel, Teaching Assistant</p>
+		</div>
+		
+		<div>
+		<p style="color: rgba(0, 0, 0, 0.1); font-size: 10pt" align="right">last updated <span id="dat"></span> </p>
+		</div>
+	</div>
+</div>
+
+
+<script>
+    function lastModifiedDate() {
+      var x = document.lastModified;
+      document.getElementById("dat").innerHTML =  x.substr(3,3) + x.substr(0,2) + x.substr(5,5);
+	  
+    };
+</script>
+
+</body>
+</html>
