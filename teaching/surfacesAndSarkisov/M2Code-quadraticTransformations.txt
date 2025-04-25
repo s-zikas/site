@@ -1,0 +1,28 @@
+quadr = typ -> (
+	d := typ_0;
+	lst := drop(typ,1);
+	lstSorted := sort(lst);
+	typSort := {d}|lstSorted;
+	m1 = typSort_1;
+	m2 = typSort_2;
+	m3 = typSort_3;
+	newd := 2*d - m1 - m2 - m3;
+	newm1:= d - m1 - m2 - m3 + m1;
+	newm2:= d - m1 - m2 - m3 + m2;
+	newm3:= d - m1 - m2 - m3 + m3;
+	newMults := {newm1,newm2,newm3} | drop(typSort,4);
+	newType := {newd} | rsort(newMults)
+)
+
+L = {1,1,1,0,0,0,0,0,0,0}
+
+
+d = 500;
+Q = L; D = 1;
+
+while D < d do(
+	Q = quadr(Q);
+	D = Q_0;
+	print Q
+)
+
