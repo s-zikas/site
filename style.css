@@ -135,7 +135,7 @@ td{
 }
 
 tr:nth-child(even) {
-  background-color: #ddd;
+  background-color: #f1f1f1;
 }
 
 /* Responsive layout - makes a one column layout instead of a two-column layout */
@@ -160,3 +160,45 @@ tr:nth-child(even) {
 		display:none;
 	}
 }
+
+/* changes the indent sizing in the pre environment */
+pre {
+    -moz-tab-size:    4; /* Firefox 4+ */
+    -o-tab-size:      4; /* Opera 11.5 & 12.1 only */
+    tab-size:         4; /* Chrome 21+, Safari 6.1+, Opera 15+ */
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  background-color: #232323;
+  color: white;
+  cursor: pointer;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  border-bottom:1px solid #6D6D6D;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 12px;
+  padding-top: 12px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
