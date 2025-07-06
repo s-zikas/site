@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<link rel="stylesheet" href="style.css">
+
+<title> Sokratis Zikas </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+
+<meta property="og:url" content="https://s-zikas.github.io/site/index.html" />
+<meta property="og:image" content="https://s-zikas.github.io/site/OW.jpg" />
+<meta name="description" content="Sokratis Zikas' homepage"/>
+<meta name="Keywords" content="Sokratis Zikas, Σωκρατης Ζηκας, mathematics, math"/>
+
+</head>
+
+<body onload="lastModifiedDate()">
+
+
+<div class="flexcontainer">
+	<div class="columns">
+	<div style="display: inline-block; align-self: flex-end;">
+
+		<div align="center">
+		<h1 style="color:white;" >Sokratis Zikas</h1>
+
+		<p><img src="OW.jpg" width="180px" title="That's a decent picture of me" /></p>
+
+		<h3 style="color:white">Contact Information</h3>
+		</div>
+
+		<p>
+		<strong style="color:white">Address</strong><br/>
+		IMPA - Instituto de Matemática Pura e Aplicada <br />
+		Estrada Dona Castorina, 110 <br />
+		Jardim Botânico, 22460-320 <br />
+		Rio de Janeiro, RJ - Brasil
+		</p>
+
+		<p>
+		<strong style="color:white">E-mail</strong><br />
+		sokratis.zikas [add @impa.br]
+		</p>
+	</div>
+	</div>
+
+
+	<div class="columns">
+
+
+
+		<div class="navbar">
+			<a href="index.html" >Research</a>
+			<a href="activities.html">Activities</a>
+			<a class="active" href="code.html">Code</a>
+			<a href="teaching.html">Teaching</a>
+		</div>
+
+		<div class="mainContent">
+		
+		<h2>Some Macaulay2 methods</h2>
+		
+		<button type="button" class="collapsible"><code>gensLinearSystem</code></button>
+			<div class="content">
+			Returns a generating set of a linear system of type <code>{d,{m_1,...,m_k}}</code> through the points <code>pts</code> in the projective space <code>Pn</code>.	
+<pre><code>gensLinearSystem = (Pn, type, pts) -> (
+	de := type_0;
+	mults := type_1;
+	if (max mults) == 0 then (
+		return basis(de,Pn) 
+	)
+	else(
+		l := #mults-1;
+		M := basis(de,Pn);
+		k := (numgens source M);
+		N := matrix{toList (k:0)};
+		for i from 0 to l do(
+			if mults_i > 0 then(
+				P := M;
+				for j from 1 to mults_i do(
+					N = N || sub(P,matrix{pts_i});
+					P = jacobian(P);
+				);
+			);
+		);
+	);
+	u := numgens target N -1;
+	N = N^(toList (1..u));
+	(transpose(generators kernel N))*(transpose M)
+)</code></pre>
+			</div>
+		
+		<button type="button" class="collapsible"><code>randomPoints</code></button>
+			<div class="content">
+			Input: <code>(Pn, k)</code> or <code>(kk, n, k)</code>.<br>
+			Returns a list of <code>k</code> random points in projective space <code>Pn</code>, or <code>k</code> random (<code>n+1</code>)-tuples of elements in a field <code>kk</code>.
+<pre><code>randomPoints = arg -> (
+	if #arg ==2 then(
+		Pn:= arg_0;k:= arg_1;
+	 	cR = coefficientRing Pn;
+		pts := {};
+		n := numgens source vars Pn;
+		for i from 0 to k-1 do(
+			p := {};
+			for j from 0 to n-1 do(
+				p = p | {random(cR)};
+			);
+			pts = pts | {p};
+		);
+		return pts;
+	);
+	if #arg == 3 then(
+		kk := arg_0; n:= arg_1; k:= arg_2;
+		pts := {};
+		for i from 0 to k-1 do(
+			p := {};
+			for j from 0 to n do(
+				p = p | {random(kk)};
+			);
+			pts = pts | {p};
+		);
+		return pts;
+	)
+)</code></pre>
+			</div>
+			
+		<button type="button" class="collapsible"><code>curveOnCubic</code></button>
+			<div class="content">
+			Returns a curve of type <code>{k,{m1,...,mk}}</code> in a cubic surface in projective space <code>P3</code>; 
+			the surface depends on the choice of 6 points <code>pts</code>;
+			requires gensLinearSystem and randomPoints.
+<pre><code>curveOnCubic = (P3, type) -> (
+	kk := coefficientRing P3;
+	P2 := kk[z_0..z_2];
+	pts:= randomPoints(P2,6);
+	N  := gensLinearSystem(P2, type, pts);
+	n  := numgens target N;
+	gam := ideal((random(ZZ^1,ZZ^n)*N)_(0,0));
+	K  := transpose gensLinearSystem(P2, {3, {1, 1, 1, 1, 1, 1}}, pts);
+	kernel map(P2/gam,P3,K)
+)
+	
+curveOnCubic = (P3, type, pts) -> (
+	kk := coefficientRing P3;
+	P2 := kk[z_0..z_2];
+	N  := gensLinearSystem(P2, type, pts);
+	n  := numgens target N;
+	gam := ideal((random(ZZ^1,ZZ^n)*N)_(0,0));
+	K  := transpose gensLinearSystem(P2, {3, {1, 1, 1, 1, 1, 1}}, pts);
+	kernel map(P2/gam,P3,K)
+)	
+	</code></pre>
+			</div>
+
+		<button type="button" class="collapsible"><code>typeOnCubic</code></button>
+			<div class="content">
+			Returns the type <code>{k,{m1,...,m6}}</code> of a curve of genus <code>g</code> and degree <code>d</code> on a smooth cubic surface under the assumptions $k \geq m_1 + m_2 + m_3$ and $m_1 \geq m_2 \geq\ldots\geq m_6$.
+<pre><code>typeOnCubic = (g,d) -> (
+	for k from 1 to d do(
+	for m1 from floor((3*k- d)/6) to (3*k-d) do(
+	for m2 from floor((3*k- d- m1)/5) to min(3*k- d- m1, m1) do(
+	for m3 from floor((3*k- d- m1- m2)/4) to min(3*k- d- m1- m2, m2, k- m1- m2) do(
+	for m4 from floor((3*k- d- m1- m2- m3)/3) to min(3*k- d- m1- m2- m3, m3) do(
+	for m5 from floor((3*k- d- m1- m2- m3- m4)/2) to min(3*k- d- m1- m2- m3- m4, m4) do(
+		m6 := (3*k- d)- m1 - m2- m3- m4- m5;
+		if (m6 >= 0) and (m5 >= m6) then(
+			sq := k^2- m1^2- m2^2- m3^2- m4^2- m5^2- m6^2;
+			if (sq == 2*g-2+d) then break return {k, {m1, m2, m3, m4, m5, m6}}
+		);
+		);
+	);
+	);
+	);
+	);	
+	);
+)</code></pre>
+			</div>
+			
+		<button type="button" class="collapsible"><code>randomElement</code></button>
+			<div class="content">
+			Returns a random element of degree <code>d</code>, of a homogeneous ring or ideal <code>I</code>; adapted by <a href="https://sites.google.com/view/montserratvite-math/randomelement" target="_blank">Montserrat Vite</a>'s code.
+			
+<pre><code>randomElement = (d,I) -> (
+	rdmElem := 0;
+	if (toString class I == "PolynomialRing") then(
+		rdmElem = random(d,I);
+	)
+	else (
+		R := ring I;
+		listOfGensI := flatten entries gens I;
+		for gen in listOfGensI do(
+			k := (degree gen)_0;
+			rdmElem = rdmElem + gen*random(d-k,R);
+		);
+	);
+	return rdmElem;
+)</code></pre>
+			</div>
+			
+		<h2>Some examples</h2>	
+		
+		<button type="button" class="collapsible">Volume preseving cubo-cubic transformation</button>
+			<div class="content">
+			
+<pre><code>prm = nextPrime(1000);
+kk = ZZ/prm;
+pts = {{1,0,0},{0,1,0},{0,0,1},{1,1,1}} | randomPoints(kk,2,2);
+typ = typeOnCubic(3,6);
+P3 = kk[x_0..x_3];
+C = curveOnCubic(P3, typ, pts);
+(genus C, degree C, saturate ideal singularLocus C)
+degrees C 
+--answer: (3, 6, ideal 1), {{3}, {3}, {3}, {3}} that is
+--C is a smooth curve of genus and degree (3,6) cut out by 4 cubics
+
+cubcub = map(P3,P3,gens C);
+--the cubo-cubic transformation is defined by the cubics cutting out C
+
+e = randomElement(8, saturate(C^3));
+E = ideal(e);
+C'=preimage(cubcub,E)
+((dim C') - 1, genus C', degree C', saturate ideal singularLocus C')
+--answer: (1, 3, 6, ideal 1) that is
+--cubcub contracts the unique surface E of degree 8 triple along C
+--E is swept out by trisecant lines to C 
+
+L = curveOnCubic(P3, {2,{1,1,1,1,1,0}}, pts);
+(genus L, degree L, degree (L+C), dim(preimage(cubcub,L))-1) 
+--answer: (0, 1, 3, 1) i.e. L is a such a trisecant line and is indeed contracted
+
+s1 = randomElement(4,intersect(C,L));
+S1 = ideal(s1)
+S2 = preimage(cubcub,S1)
+--S1 is a quartic containing C and L, S2 is its image under cubcub
+
+(saturate ideal singularLocus S1, saturate ideal singularLocus S2)
+--S1 is smooth, while S2 has a double point, an A_1-singularity along the image of L
+</code></pre>
+</div>
+		
+		
+		</div>
+			
+		
+		<div>
+		<p style="color: rgba(0, 0, 0, 0.1); font-size: 10pt" align="right">last updated <span id="dat"></span>  </p>
+		</div>
+	</div>
+</div>
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+
+<script>
+	function lastModifiedDate() {
+      var x = document.lastModified;
+      document.getElementById("dat").innerHTML =  x.substr(3,3) + x.substr(0,2) + x.substr(5,5);
+	  
+    };
+</script> 
+
+<script type="text/javascript"
+  src="https://www.maths.nottingham.ac.uk/plp/pmadw/LaTeXMathML.js">
+  </script>
+
+</body>
+</html>
