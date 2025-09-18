@@ -129,28 +129,31 @@
 			
 		<button type="button" class="collapsible"><code>curveOnCubic</code></button>
 			<div class="content">
-			Returns a curve of type <code>{k,{m1,...,mk}}</code> in a cubic surface in projective space <code>P3</code>; 
-			the surface depends on the choice of 6 points <code>pts</code>;
+			Input: <code>(P3, type)</code> or <code>(P3, type, pts)</code>.<br>
+			Returns the ideal of a curve of type <code>type = {k,{m1,...,m6}}</code> in a cubic surface in projective space <code>P3</code>; if a sextuple of points <code>pts</code> is given, then the cubic surface is the one obtained by blowing up these points in &#x2119;<sup>2</sup>;
 			requires gensLinearSystem and randomPoints.
-<pre><code>curveOnCubic = (P3, type) -> (
-	kk := coefficientRing P3;
-	P2 := kk[z_0..z_2];
-	pts:= randomPoints(P2,6);
-	N  := gensLinearSystem(P2, type, pts);
-	n  := numgens target N;
-	gam := ideal((random(ZZ^1,ZZ^n)*N)_(0,0));
-	K  := transpose gensLinearSystem(P2, {3, {1, 1, 1, 1, 1, 1}}, pts);
-	kernel map(P2/gam,P3,K)
-)
-	
-curveOnCubic = (P3, type, pts) -> (
-	kk := coefficientRing P3;
-	P2 := kk[z_0..z_2];
-	N  := gensLinearSystem(P2, type, pts);
-	n  := numgens target N;
-	gam := ideal((random(ZZ^1,ZZ^n)*N)_(0,0));
-	K  := transpose gensLinearSystem(P2, {3, {1, 1, 1, 1, 1, 1}}, pts);
-	kernel map(P2/gam,P3,K)
+<pre><code>curveOnCubic = arg -> (
+	if #arg == 2 then(
+		P3 := arg_0; type := arg_1;
+		kk := coefficientRing P3;
+		P2 := kk[z_0..z_2];
+		pts:= randomPoints(P2,6);
+		N  := gensLinearSystem(P2, type, pts);
+		n  := numgens target N;
+		gam := ideal((random(ZZ^1,ZZ^n)*N)_(0,0));
+		K  := transpose gensLinearSystem(P2, {3, {1, 1, 1, 1, 1, 1}}, pts);
+		kernel map(P2/gam,P3,K)
+	);
+	if #arg == 3 then(
+		P3 := arg_0; type := arg_1; pts := arg_2;
+		kk := coefficientRing P3;
+		P2 := kk[z_0..z_2];
+		N  := gensLinearSystem(P2, type, pts);
+		n  := numgens target N;
+		gam := ideal((random(ZZ^1,ZZ^n)*N)_(0,0));
+		K  := transpose gensLinearSystem(P2, {3, {1, 1, 1, 1, 1, 1}}, pts);
+		kernel map(P2/gam,P3,K)
+	)
 )	
 	</code></pre>
 			</div>
