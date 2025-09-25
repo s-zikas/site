@@ -202,7 +202,23 @@
 	return rdmElem;
 )</code></pre>
 			</div>
-			
+		<button type="button" class="collapsible"><code>tangentHyperplane</code></button>
+			<div class="content">
+			Given a hypersurface X = (<code>f</code> = 0) in a projective space &#x2119;<sup>n</sup> and the ideal <code>Ip</code> of a point p on X, returns the tangent hyperplane to X at p.
+<pre><code>tangentHyperplane = (f,Ip) -> (
+	Pk := ring f;
+	Ip = trim Ip;
+	lin:= sub(random(1,Pk/Ip),Pk);
+	chanInv:= matrix{{lin}} | gens Ip;
+	chan := ((coefficients(chanInv))_0)*(((coefficients(chanInv))_1)^(-1));
+	f' := sub(sub(f,chan),((gens Pk)_0)=>1);
+	T' := 0_(Pk);
+	for g in gens Pk do(
+		T' = T' + coefficient(g,f')*g
+	);
+	T = sub(T',chanInv)
+);</code></pre>
+			</div>	
 		<h2>Some examples</h2>	
 		
 		<button type="button" class="collapsible">Volume preseving cubo-cubic transformation</button>
@@ -214,9 +230,9 @@ pts = {{1,0,0},{0,1,0},{0,0,1},{1,1,1}} | randomPoints(kk,2,2);
 typ = typeOnCubic(3,6);
 P3 = kk[x_0..x_3];
 C = curveOnCubic(P3, typ, pts);
-(genus C, degree C, saturate ideal singularLocus C)
+(genus C, degree C, dim singularLocus C - 1)
 degrees C 
---answer: (3, 6, ideal 1), {{3}, {3}, {3}, {3}} that is
+--answer: (3, 6, -1), {{3}, {3}, {3}, {3}} that is
 --C is a smooth curve of genus and degree (3,6) cut out by 4 cubics
 
 cubcub = map(P3,P3,gens C);
@@ -225,8 +241,8 @@ cubcub = map(P3,P3,gens C);
 e = randomElement(8, saturate(C^3));
 E = ideal(e);
 C'=preimage(cubcub,E)
-((dim C') - 1, genus C', degree C', saturate ideal singularLocus C')
---answer: (1, 3, 6, ideal 1) that is
+((dim C') - 1, genus C', degree C', dim singularLocus C' -1)
+--answer: (1, 3, 6, -1) that is
 --cubcub contracts the unique surface E of degree 8 triple along C
 --E is swept out by trisecant lines to C 
 
@@ -239,8 +255,182 @@ S1 = ideal(s1)
 S2 = preimage(cubcub,S1)
 --S1 is a quartic containing C and L, S2 is its image under cubcub
 
-(saturate ideal singularLocus S1, saturate ideal singularLocus S2)
---S1 is smooth, while S2 has a double point, an A_1-singularity along the image of L
+(dim singularLocus S1 -1, dim singularLocus S2 -1)
+radical ideal singularLocus S2 == preimage(cubcub,L)
+--answer: (-1,0) and true, i.e. S1 is smooth, while S2 has a singularity along the image of L
+</code></pre>
+</div>
+
+<button type="button" class="collapsible">Birational geometry of (11,10) curves</button>
+			<div class="content">
+			
+<pre><code>prm = nextPrime(100);
+kk = ZZ/prm;
+P3 = kk[x_0..x_3];
+P4 = kk[z_0..z_4];
+
+typ = typeOnCubic(11,10)
+C2  = curveOnCubic(P3,typ);
+(genus C2, degree C2, dim singularLocus C2 -1, degrees C2)
+
+--answer: (11, 10, -1, {{3}, {4}, {5}, {5}}), i.e. C2 is a smooth curve
+--of genus 11 and degree 10 on a cubic surface
+
+
+quintisecants = primaryDecomposition saturate(ideal super basis(4,C2),C2);
+for l in quintisecants do(
+	g := genus l;
+	d := degree l;
+	m := degree saturate(C2+l);
+	print (g,d,m)
+)
+
+--answer: 2x(0,1,5), i.e. C2 has exactly 2 quintisecant lines
+
+f4 := randomElement(4,C2); f5 := randomElement(5,C2);
+C1 = saturate(ideal(f4,f5),C2);
+(genus C1, degree C1, dim singularLocus C1- 1, degrees C1)
+
+--answer: (11, 10, -1, {{4}, {4}, {4}, {4}, {4}}), i.e. the (4,5)-linked curve C1 to C2
+--is again a smooth (11,10) curve, this time not contained in a cubic
+										
+rank HH^0((sheaf(P3^1/C1))(2))  == genus C1 	
+
+--answer: true which means that OO_C1(2) = \omega_C1, i.e. C1 is 2-subcanonical
+
+c0 = ideal(x_0,x_1);
+g0 = randomElement(2,c0); h0 = randomElement(2,c0); 
+c1 = saturate(ideal(g0,h0),c0);
+g1 = randomElement(3,c1); h1 = randomElement(3,c1); 
+c2 = saturate(ideal(g1,h1),c1);
+g2 = randomElement(4,c2); h2 = randomElement(4,c2); 
+
+C = saturate(ideal(g2,h2),c2);
+
+((genus c0, degree c0), (genus c1, degree c1), (genus c2, degree c2))
+(genus C, degree C, dim singularLocus C -1, degrees C)
+rank HH^0((sheaf(P3^1/C))(2))  == genus C 
+
+--answers: ((0, 1), (0, 3), (3, 6)),  (11, 10, -1, {{4}, {4}, {4}, {4}, {4}}) and false
+--C is obtained by a series of linkages (0,1) <--> (0,3) <--> (3,6) <--> (11,10) it is 
+--therefore an ACM curve, smooth, not contained in a cubic and it is not 2-subcanonical
+
+
+spC3 = saturate C^3; degrees spC3					
+chC = map(P3,P3,super basis(11,spC3));
+
+spC13 = saturate C1^3; degrees spC13	
+chC1 = map(P3,P3,super basis(11,spC13));	
+		
+--answer: {{11}, {11}, {11}, {11}, {12}, ..., {12}}, in both cases
+--as expected by the tables of Cutrone-Marshburn there are 4 generators in degree 11 
+--which define a rational map from P3 to P3
+
+pGen := ideal(random(1,P3),random(1,P3),random(1,P3));
+prGen := saturate preimage_chC pGen;
+prGen1 := saturate preimage_chC1 pGen;
+(degree prGen, dim prGen -1)
+(degree prGen1, dim prGen1 -1)					
+
+--answer: 2x(1,0), that is the preimage of a general point 
+--under chC/chC1 is again a point, i.e. chC/chC1 is birational
+
+quadrisecs = saturate(ideal matrix chC, C);
+quadrisecs1 = saturate(ideal matrix chC1, C1);
+(dim quadrisecs -1, degree quadrisecs, genus quadrisecs)	
+(dim quadrisecs1 -1, degree quadrisecs1, genus quadrisecs1)					
+
+--answer: 2x(1,20,19), that is the base locus of chC/chC1 is C/C1 and a 1-dimensional
+--scheme of degree 20 and arithmetic genus 19, which can only mean 20 skew lines
+
+--we now want to show that chC1 is an involution
+fcan1 = map(P3,P4,gens C1); Xcan1 = kernel fcan1;
+(dim Xcan1 - 1, degree Xcan1, dim singularLocus Xcan1-1)	
+
+--answer: (3,2,-1), i.e. the image of the anticanonical morphism 
+--of the blowup along C1 is a smooth quadric 3-fold
+
+f4 := randomElement(4,C1); g4 := randomElement(4,C1);
+C361 = saturate(ideal(f4,g4),C1);
+(genus C361, degree C361, dim singularLocus C361-1, degrees C361)
+
+--answer: (3, 6, -1, {{2}, {4}, {4}, {4}}), i.e. C361 is a smooth (3,6) curve contained
+--in a quadric, necessarily as a divisor of bidegree (2,4) and thus hyperelliptic
+
+P36 = kernel map(P3/C361,P4,gens C1);
+(dim P36 -1, genus P36, degree P36)									
+--answer: (1, 0, 2), that is the image of anticanonical morphism restricted to C361 is 
+--a smooth conic and is thus the quotient by the hyperelliptic involution
+--since a C361 is a general residual curve, the anticanonical morphism is 2-to-1.
+--the map chC1 is regularized as the covering map of this 2-to-1 cover
+
+f4 := randomElement(4,C); g4 := randomElement(4,C);
+C36 = saturate(ideal(f4,g4),C);
+(genus C36, degree C36, 3-codim singularLocus C36, degrees C36)
+fcan = map(P3,P4,gens C); Xcan = kernel fcan;
+(dim Xcan -1, degree Xcan, dim singularLocus Xcan-1)				
+
+--answer: (3, 6, -1, {{3}, {3}, {3}, {3}}) and (3,4,0), that is the residual curve C36 
+--to C is not contained in a quadric, and not hyperelliptic, the anticanonical model 
+--in this case is a singular quartic 3-fold
+
+--finding quadrisecants to C and C1
+chk = false;
+while chk == false do(
+	L = ideal(random(1,P3),random(1,P3));
+	L1 = ideal(random(1,P3),random(1,P3));
+	m := degree(saturate(C36+L));
+	m1:= degree(saturate(C361+L1));
+	if (m,m1) == (0,0) then chk = true
+)
+
+C36L = intersect(C36,L);
+f4 := randomElement(4,C36L); g4 := randomElement(4,C36);
+C = saturate(ideal(f4,g4),C36);
+C36L1 = intersect(C361,L1);
+f4 := randomElement(4,C36L1); g4 := randomElement(4,C361);
+C1 = saturate(ideal(f4,g4),C361);
+(genus C, degree C, dim singularLocus C -1, degree(saturate(C+L)))
+(genus C1, degree C1, dim singularLocus C1 -1, degree(saturate(C1+L1)))
+
+--answer: 2x(11, 10, -1, 4), C and C1 are new smooth (11,10) curves
+--and L/L1 are quadrisecants to C/C1
+
+spC3 = saturate C^3; chC = map(P3,P3,super basis(11,spC3));
+fcan = map(P3,P4,gens C); Xcan = kernel fcan;
+spC13 = saturate C1^3; chC1 = map(P3,P3,super basis(11,spC13));
+fcan1 = map(P3,P4,gens C1); Xcan1 = kernel fcan1;
+
+--finding a congruence of 6-secants to C1, incident to planes containing L1
+Ip = preimage_(fcan1) L1;
+Tp = tangentHyperplane(Xcan1_0,Ip);
+T1 = ideal fcan1(Tp)
+(radical saturate ideal singularLocus T1) == L1
+
+--T1 is a quartic surface containing C1, double along the line L1
+
+Pt = randomElement(1,L1);								
+ct = saturate(ideal(Pt,T1),L1);
+(genus ct ,degree ct, degree(saturate(ct+C1)))			
+
+--the residual intersection ct of a plane Pt containing L1 
+--with T1 is a conic, 6-secant to C1
+
+spC2 = saturate C^2;
+C2L4 = saturate (intersect(spC2,(L^4)));
+degrees C2L4
+chCL = map(P3,P3,super basis(9,C2L4));
+pGen := ideal(random(1,P3),random(1,P3),random(1,P3));
+prGenCL := saturate preimage_chCL pGen;
+(degree prGen, dim prGen -1)										
+
+--answer:{{9}, {9}, {9}, {9}, {10}, ..., {10}}, i.e. there are 4 generators
+--in degree 9 which define a birational map from P3 to P3
+
+trisecants = saturate(saturate(ideal matrix chCL, L),C);
+(degree trisecants, genus trisecants)					
+
+--answer:(16,-15), i.e. there are 16 3-secant lines to C, incident to a plane containing L
 </code></pre>
 </div>
 		
